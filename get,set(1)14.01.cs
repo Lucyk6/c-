@@ -314,6 +314,87 @@
               {
                   comp.DisplayInfo();
               }
+
+
+
+
+              
+ 7)  public class Book
+  {
       
+      public string Title { get; set; }
+      public string Author { get; set; }
+      public string Genre { get; set; }
+
+      private static int bookCount = 0;
+
+      public Book()
+      {
+          Title = "Неизвестно";
+          Author = "Неизвестно";
+          Genre = "Неизвестно";
+          bookCount++; 
+          Console.WriteLine($" Создана книга: {Title}");
+      }
+
+      
+      public Book(string title, string author, string genre)
+      {
+          Title = title;
+          Author = author;
+          Genre = genre;
+          bookCount++;  
+          Console.WriteLine($" Создана книга: \"{Title}\"");
+      }
+
+      public void PrintInfo()
+      {
+          Console.WriteLine($" Название: {Title}");
+          Console.WriteLine($" Автор: {Author}");
+          Console.WriteLine($"  Жанр: {Genre}");
+      }
+
+  
+      public static void ShowTotalBooks()
+      {
+          Console.WriteLine($" Всего создано книг: {bookCount}");
+      }
+
+
+      public static int TotalBooks
+      {
+          get { return bookCount; }
+      }
+  }
+
+  class Program
+  {
+      static void Main(string[] args)
+      {
+        
+
+          
+          Console.WriteLine("1. Создаем первую книгу:");
+          Book book1 = new Book("Жаркое соперничество", "Рейчел Рид", "Роман");
+          book1.PrintInfo();
+          Book.ShowTotalBooks();
+
+        
+          Console.WriteLine("2. Создаем вторую книгу:");
+          Book book2 = new Book("Сумерки", "Стефани Майер", "Романтическое фэнтези");
+          book2.PrintInfo();
+          Book.ShowTotalBooks();
+
+     ;
+
+          Console.WriteLine("3. Создаем третью книгу:");
+          Book book3 = new Book("Мятная сказка", "Александр Полярный", "детская проза");
+          book3.PrintInfo();
+          Book.ShowTotalBooks();
+
+      
+
+          Console.WriteLine($"Ожидаемое количество книг: 3");
+          Console.WriteLine($"Фактическое количество: {Book.TotalBooks}");     
           }
       }
