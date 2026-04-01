@@ -1,0 +1,273 @@
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Media;
+
+namespace SiConverter
+{
+    public partial class MainWindow : Window
+    {
+        // Структура для хранения единицы измерения
+        private class Unit
+        {
+            public string Name { get; set; }
+            public double ToBaseFactor { get; set; } // Коэффициент перевода в базовую единицу СИ
+            
+            public Unit(string name, double toBaseFactor)
+            {
+                Name = name;
+                ToBaseFactor = toBaseFactor;
+            }
+            
+            public override string ToString()
+            {
+                return Name;
+            }
+        }
+        
+        // Категории с единицами
+        private Dictionary<string, List<Unit>> categories;
+        
+        public MainWindow()
+        {
+            InitializeComponent();
+            InitializeData();
+            LoadCategories();
+        }
+        
+        private void InitializeData()
+        {
+            categories = new Dictionary<string, List<Unit>>();
+            
+            // Длина (базовая: метр)
+            categories["Длина"] = new List<Unit>
+            {
+                new Unit("Метр (m)", 1),
+                new Unit("Километр (km)", 1000),
+                new Unit("Сантиметр (cm)", 0.01),
+                new Unit("Миллиметр (mm)", 0.001),
+                new Unit("Микрометр (µm)", 0.000001),
+                new Unit("Нанометр (nm)", 1e-9),
+                new Unit("Миля (mi)", 1609.344),
+                new Unit("Фут (ft)", 0.3048),
+                new Unit("Дюйм (in)", 0.0254),
+                new Unit("Ярд (yd)", 0.9144)
+            };
+            
+            // Масса (базовая: килограмм)
+            categories["Масса"] = new List<Unit>
+            {
+                new Unit("Килограмм (kg)", 1),
+                new Unit("Грамм (g)", 0.001),
+                new Unit("Миллиграмм (mg)", 0.000001),
+                new Unit("Тонна (t)", 1000),
+                new Unit("Фунт (lb)", 0.453592),
+                new Unit("Унция (oz)", 0.0283495)
+            };
+            
+            // Время (базовая: секунда)
+            categories["Время"] = new List<Unit>
+            {
+                new Unit("Секунда (s)", 1),
+                new Unit("Минута (min)", 60),
+                new Unit("Час (h)", 3600),
+                new Unit("Сутки (day)", 86400),
+                new Unit("Миллисекунда (ms)", 0.001),
+                new Unit("Микросекунда (µs)", 0.000001)
+            };
+            
+            // Температура (особый случай, нелинейная)
+            categories["Температура"] = new List<Unit>
+            {
+                new Unit("Кельвин (K)", 1),
+                new Unit("Цельсий (°C)", 1),
+                new Unit("Фаренгейт (°F)", 1)
+            };
+            
+            // Площадь (базовая: квадратный метр)
+            categories["Площадь"] = new List<Unit>
+            {
+                new Unit("Кв. метр (m²)", 1),
+                new Unit("Кв. километр (km²)", 1000000),
+                new Unit("Кв. сантиметр (cm²)", 0.0001),
+                new Unit("Гектар (ha)", 10000),
+                new Unit("Акр (ac)", 4046.86)
+            };
+            
+            // Объем (базовая: кубический метр)
+            categories["Объем"] = new List<Unit>
+            {
+                new Unit("Куб. метр (m³)", 1),
+                new Unit("Литр (L)", 0.001),
+                new Unit("Миллилитр (mL)", 0.000001),
+                new Unit("Галлон (gal)", 0.00378541),
+                new Unit("Куб. фут (ft³)", 0.0283168)
+            };
+            
+            // Скорость (базовая: метр в секунду)
+            categories["Скорость"] = new List<Unit>
+            {
+                new Unit("м/с (m/s)", 1),
+                new Unit("км/ч (km/h)", 0.277778),
+                new Unit("миль/ч (mph)", 0.44704),
+                new Unit("узел (kn)", 0.514444)
+            };
+            
+            // Давление (базовая: паскаль)
+            categories["Давление"] = new List<Unit>
+            {
+                new Unit("Паскаль (Pa)", 1),
+                new Unit("килопаскаль (kPa)", 1000),
+                new Unit("бар (bar)", 100000),
+                new Unit("атмосфера (atm)", 101325),
+                new Unit("мм рт. ст. (mmHg)", 133.322)
+            };
+            
+            // Энергия (базовая: джоуль)
+            categories["Энергия"] = new List<Unit>
+            {
+                new Unit("Джоуль (J)", 1),
+                new Unit("килоджоуль (kJ)", 1000),
+                new Unit("калория (cal)", 4.184),
+                new Unit("килокалория (kcal)", 4184),
+                new Unit("электронвольт (eV)", 1.60217662e-19),
+                new Unit("ватт-час (Wh)", 3600)
+            };
+            
+            // Мощность (базовая: ватт)
+            categories["Мощность"] = new List<Unit>
+            {
+                new Unit("Ватт (W)", 1),
+                new Unit("киловатт (kW)", 1000),
+                new Unit("мегаватт (MW)", 1000000),
+                new Unit("лошадиная сила (hp)", 745.7)
+            };
+        }
+        
+        private void LoadCategories()
+        {
+            foreach (var category in categories.Keys)
+            {
+                cmbCategory.Items.Add(category);
+            }
+            
+            if (cmbCategory.Items.Count > 0)
+                cmbCategory.SelectedIndex = 0;
+        }
+        
+        private void CmbCategory_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (cmbCategory.SelectedItem == null) return;
+            
+            string selectedCategory = cmbCategory.SelectedItem.ToString();
+            
+            cmbFrom.Items.Clear();
+            cmbTo.Items.Clear();
+            
+            foreach (var unit in categories[selectedCategory])
+            {
+                cmbFrom.Items.Add(unit);
+                cmbTo.Items.Add(unit);
+            }
+            
+            if (cmbFrom.Items.Count > 0)
+            {
+                cmbFrom.SelectedIndex = 0;
+                cmbTo.SelectedIndex = 1 % cmbTo.Items.Count;
+            }
+        }
+        
+        private async void BtnConvert_Click(object sender, RoutedEventArgs e)
+        {
+            // Показать ProgressBar
+            progressBar.Visibility = Visibility.Visible;
+            progressBar.IsIndeterminate = true;
+            
+            // Имитация загрузки для анимации
+            await System.Threading.Tasks.Task.Delay(100);
+            
+            try
+            {
+                // Проверка ввода
+                if (string.IsNullOrWhiteSpace(txtValue.Text))
+                {
+                    lblResult.Text = "Ошибка: Введите значение!";
+                    return;
+                }
+                
+                if (!double.TryParse(txtValue.Text, out double value))
+                {
+                    lblResult.Text = "Ошибка: Введите корректное число!";
+                    return;
+                }
+                
+                if (cmbCategory.SelectedItem == null)
+                {
+                    lblResult.Text = "Ошибка: Выберите категорию!";
+                    return;
+                }
+                
+                if (cmbFrom.SelectedItem == null || cmbTo.SelectedItem == null)
+                {
+                    lblResult.Text = "Ошибка: Выберите единицы измерения!";
+                    return;
+                }
+                
+                string category = cmbCategory.SelectedItem.ToString();
+                Unit fromUnit = (Unit)cmbFrom.SelectedItem;
+                Unit toUnit = (Unit)cmbTo.SelectedItem;
+                
+                double result;
+                
+                // Особый случай для температуры (нелинейная)
+                if (category == "Температура")
+                {
+                    result = ConvertTemperature(value, fromUnit.Name, toUnit.Name);
+                }
+                else
+                {
+                    // Стандартная конвертация через базовую единицу
+                    double inBase = value * fromUnit.ToBaseFactor;
+                    result = inBase / toUnit.ToBaseFactor;
+                }
+                
+                lblResult.Text = $"Результат: {result:F6} {toUnit.Name.Split('(')[0].Trim()}";
+            }
+            catch (Exception ex)
+            {
+                lblResult.Text = $"Ошибка: {ex.Message}";
+            }
+            finally
+            {
+                // Скрыть ProgressBar
+                progressBar.IsIndeterminate = false;
+                progressBar.Visibility = Visibility.Collapsed;
+            }
+        }
+        
+        private double ConvertTemperature(double value, string fromUnit, string toUnit)
+        {
+            // Сначала переводим в Кельвины
+            double kelvin;
+            
+            if (fromUnit.Contains("Кельвин"))
+                kelvin = value;
+            else if (fromUnit.Contains("Цельсий"))
+                kelvin = value + 273.15;
+            else if (fromUnit.Contains("Фаренгейт"))
+                kelvin = (value - 32) * 5 / 9 + 273.15;
+            else
+                throw new Exception("Неизвестная единица температуры");
+            
+            // Переводим из Кельвинов в целевую единицу
+            if (toUnit.Contains("Кельвин"))
+                return kelvin;
+            else if (toUnit.Contains("Цельсий"))
+                return kelvin - 273.15;
+            else if (toUnit.Contains("Фаренгейт"))
+                return (kelvin - 273.15) * 9 / 5 + 32;
+            else
+                throw new Exception("Неизвестная единица температуры");
+        }
+    }
+} 
