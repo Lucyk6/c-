@@ -29,3 +29,29 @@ class Program
         }
     }
 }
+2)
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+
+        Func<int, int> square = x => x * x;
+        Action<int> print = x => Console.WriteLine($"Результат: {x}");
+
+        var squaredNumbers = numbers.Select(square).ToList();
+
+        Console.WriteLine("Квадраты чисел:");
+        squaredNumbers.ForEach(print);
+
+        numbers
+            .Select(square)       
+            .Where(x => x > 10)   
+            .ToList()
+            .ForEach(print);
+    }
+}
