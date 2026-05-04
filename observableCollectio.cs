@@ -23,7 +23,7 @@ namespace ConsoleApp10
             ObservableCollection<Student> students = new ObservableCollection<Student>()
             {
                new Student("Liza",18),
-               new Student(" ", 24)
+               new Student("aboba", 24)
             };
             students.CollectionChanged += StudentChanged;
 
