@@ -3,20 +3,14 @@ using System.Collections.Generic;
 
 namespace HumanCalculator
 {
-    // Класс калькулятора (только чистая логика вычислений)
     public class Calculator
     {
-        // Событие, которое будет сообщать о результате операции
         public event Action<string> OnResult;
-
-        // Главный метод: принимает два числа и лямбду (саму математическую операцию)
+        
         public double Calculate(double a, double b, Func<double, double, double> operation)
         {
-            // Выполняем вычисление, которое нам передали
             double result = operation(a, b);
-
-            // Если кто-то подписался на событие — отправляем текст с результатом
-            // (Кстати, знак '?' проверяет, есть ли подписчики, чтобы программа не упала)
+            
             OnResult?.Invoke($"Операция над {a} и {b}. Результат: {result}");
 
             return result;
